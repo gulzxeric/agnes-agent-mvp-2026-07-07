@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校园活动 Agent MVP</title>
+  <style>
+    :root {
+      --cyber-neon: #ff007f;
+      --cyber-blue: #00f0ff;
+      --cyber-bg: #0a0a12;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--cyber-bg);
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+    .glow-panel {
+      border: 2px solid var(--cyber-blue);
+      box-shadow: 0 0 15px var(--cyber-blue), inset 0 0 10px var(--cyber-blue);
+      padding: 30px;
+      border-radius: 8px;
+      background: rgba(10, 10, 18, 0.85);
+      max-width: 600px;
+      width: 100%;
+    }
+    h2 { color: var(--cyber-neon); margin-bottom: 20px; text-align: center; }
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; margin-bottom: 4px; color: var(--cyber-blue); font-size: 0.85em; }
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 8px 12px;
+      background: #1a1a2e;
+      border: 1px solid var(--cyber-blue);
+      color: #fff;
+      font-family: inherit;
+      border-radius: 4px;
+    }
+    .input-group input:focus, .input-group select:focus {
+      outline: none;
+      box-shadow: 0 0 8px var(--cyber-blue);
+    }
+    .neon-btn {
+      background: transparent;
+      border: 1px solid var(--cyber-neon);
+      color: var(--cyber-neon);
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1.1em;
+      text-transform: uppercase;
+      box-shadow: 0 0 10px var(--cyber-neon);
+      transition: all 0.3s ease;
+      width: 100%;
+      font-family: inherit;
+    }
+    .neon-btn:hover {
+      background: var(--cyber-neon);
+      color: #000;
+      box-shadow: 0 0 25px var(--cyber-neon);
+    }
+    .neon-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #output-area { margin-top: 30px; }
+    #output-area h3 { color: var(--cyber-neon); margin-bottom: 8px; }
+    #output-area p { line-height: 1.6; margin-bottom: 12px; color: #ccc; }
+    #output-area ul { margin-bottom: 12px; padding-left: 20px; }
+    #output-area ul li { margin-bottom: 4px; color: #ccc; }
+    #poster-container { margin-top: 16px; text-align: center; }
+    #poster-skeleton {
+      width: 300px;
+      height: 300px;
+      background: #1a1a2e;
+      border: 1px dashed var(--cyber-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      margin: 0 auto;
+    }
+    #poster-img {
+      max-width: 300px;
+      border: 2px solid #fff;
+      border-radius: 4px;
+    }
+    .error-msg { color: #ff4444; margin-top: 12px; }
+    .label-tag {
+      display: inline-block;
+      background: rgba(0, 240, 255, 0.15);
+      border: 1px solid var(--cyber-blue);
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.75em;
+      color: var(--cyber-blue);
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-panel">
+    <h2>⚡ 校园活动 Agent MVP</h2>
+
+    <div id="setup-form">
+      <div class="input-group">
+        <label>参与人数</label>
+        <input type="number" id="input-members" value="4" min="1" max="100">
+      </div>
+      <div class="input-group">
+        <label>天气状况</label>
+        <select id="input-weather">
+          <option value="晴朗微风的午后">☀️ 晴朗微风</option>
+          <option value="阴天有点闷">☁️ 阴天</option>
+          <option value="下着小雨">🌧️ 小雨</option>
+          <option value="大太阳很热">🔥 大太阳</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>预算（元/人）</label>
+        <input type="number" id="input-budget" value="30" min="0" max="1000">
+      </div>
+      <div class="input-group">
+        <label>大家心情</label>
+        <select id="input-mood">
+          <option value="热情高涨">🔥 热情高涨</option>
+          <option value="有点疲惫">😴 有点疲惫</option>
+          <option value="平淡如水">😐 平淡如水</option>
+          <option value="需要放松">🧘 需要放松</option>
+        </select>
+      </div>
+      <button class="neon-btn" id="btn-submit">🚀 开始策划</button>
+    </div>
+
+    <div id="output-area" style="display:none;">
+      <div class="label-tag">活动名称</div>
+      <h3 id="act-title"></h3>
+
+      <div class="label-tag" style="margin-top:12px;">策划思路</div>
+      <p id="act-reasoning"></p>
+
+      <div class="label-tag" style="margin-top:12px;">活动规则</div>
+      <ul id="act-rules"></ul>
+
+      <div class="label-tag" style="margin-top:12px;">惩罚机制</div>
+      <p id="act-punishment"></p>
+
+      <div id="poster-container">
+        <div id="poster-skeleton">⏳ 生成海报中...</div>
+        <img id="poster-img" style="display:none;" alt="活动海报"/>
+      </div>
+    </div>
+
+    <div id="error-area" class="error-msg" style="display:none;"></div>
+  </div>
+
+  <script>
+    document.getElementById('btn-submit').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-submit');
+      const outputArea = document.getElementById('output-area');
+      const errorArea = document.getElementById('error-area');
+      const skeleton = document.getElementById('poster-skeleton');
+      const posterImg = document.getElementById('poster-img');
+
+      errorArea.style.display = 'none';
+      outputArea.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = '⏳ 策划中...';
+
+      try {
+        const response = await fetch('/api/plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            memberCount: parseInt(document.getElementById('input-members').value),
+            weather: document.getElementById('input-weather').value,
+            budget: parseInt(document.getElementById('input-budget').value),
+            mood: document.getElementById('input-mood').value
+          })
+        });
+
+        const resData = await response.json();
+
+        if (resData.success) {
+          const payload = resData.data;
+          document.getElementById('act-title').textContent = payload.activityName;
+          document.getElementById('act-reasoning').textContent = payload.reasoning;
+          document.getElementById('act-punishment').textContent = payload.punishment;
+
+          const rulesList = document.getElementById('act-rules');
+          rulesList.innerHTML = '';
+          (payload.rules || []).forEach(rule => {
+            const li = document.createElement('li');
+            li.textContent = rule;
+            rulesList.appendChild(li);
+          });
+
+          posterImg.style.display = 'none';
+          skeleton.style.display = 'flex';
+          posterImg.src = payload.posterUrl;
+          posterImg.onload = () => {
+            skeleton.style.display = 'none';
+            posterImg.style.display = 'block';
+          };
+          posterImg.onerror = () => {
+            skeleton.textContent = '⚠️ 海报加载失败';
+          };
+
+          outputArea.style.display = 'block';
+        } else {
+          errorArea.textContent = '服务端错误: ' + (resData.error || '未知错误');
+          errorArea.style.display = 'block';
+        }
+      } catch (err) {
+        errorArea.textContent = '网络错误: ' + err.message;
+        errorArea.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 开始策划';
+      }
+    });
+  </script>
+</body>
+</html>
