@@ -47,6 +47,7 @@ function parseJSONStrict(raw) {
 router.post('/api/plan', async (req, res) => {
   try {
     const { memberCount, weather, budget, mood } = req.body;
+    console.log(req.body,1111)
 
     if (!memberCount || !weather || budget === undefined || !mood) {
       return res.status(400).json({
@@ -81,7 +82,7 @@ Do not wrap JSON in markdown code blocks like \\\`\\\`\\\`json. Return raw JSON 
 基于以上条件，发挥你的创意，策划一个大家想玩的校园活动。`
         }
       ],
-      temperature: 0.85
+      temperature: 1.5
     };
 
     const textResponse = await fetchWithRetry(
